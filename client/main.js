@@ -1,22 +1,38 @@
 import { Template } from 'meteor/templating';
-import { ReactiveVar } from 'meteor/reactive-var';
-
 import './main.html';
+import { Notes } from '../lib/collections.js';
 
-Template.hello.onCreated(function helloOnCreated() {
-  // counter starts at 0
-  this.counter = new ReactiveVar(0);
+Template.body.helpers({
+  
+  notes(){
+  	return Notes.find({})
+  }
+
 });
 
-Template.hello.helpers({
-  counter() {
-    return Template.instance().counter.get();
-  },
-});
+Template.add.events({
+	'submit .add-form': function(){
+		event.preventDefault();
 
-Template.hello.events({
-  'click button'(event, instance) {
-    // increment the counter when button is clicked
-    instance.counter.set(instance.counter.get() + 1);
-  },
-});
+		// get input value
+		const target = event.target;
+		const text = target.text.value;
+
+		// insert note into collection
+		Notes.insert({
+			text,
+			createdAt: new Date()
+		});
+
+		// clear form
+		target.text.value = '';
+
+		//close modal
+		$('#addModal').modal('close');
+
+		return false;
+	}
+})
+
+
+
