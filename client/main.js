@@ -2,6 +2,14 @@ import { Template } from 'meteor/templating';
 import './main.html';
 import { Notes } from '../lib/collections.js';
 
+import { Accounts } from 'meteor/accounts-base';
+
+//Accounts config
+
+Accounts.ui.config({
+	passwordSignupFields: 'USERNAME_ONLY'
+});
+
 Template.body.helpers({
   
   notes(){
@@ -18,11 +26,7 @@ Template.add.events({
 		const target = event.target;
 		const text = target.text.value;
 
-		// insert note into collection
-		Notes.insert({
-			text,
-			createdAt: new Date()
-		});
+		Meteor.call('notes.insert', text);
 
 		// clear form
 		target.text.value = '';
@@ -32,7 +36,38 @@ Template.add.events({
 
 		return false;
 	}
-})
+}),
+
+Template.note.events({
+	'submit .update-form': function(){
+		event.preventDefault();
+
+		// get input value
+		const target = event.target;
+		const text = target.text.value;
+
+		Meteor.call('notes.insert', text);
+
+		// clear form
+		target.text.value = 'target';
+
+		//close modal
+		$('#editModal').modal('close');
+
+		return false;
+	}
+}),
+
+Template.note.events({
+
+	'click .delete-note': function () {
+		//Notes.remove(this._id);
+		Meteor.call('notes.remove', this);
+		return false;
+	}
+});
+
+
 
 
 
